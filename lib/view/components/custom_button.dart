@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:tubes_apb_nih/shared/theme/theme.dart';
 
 class CustomButton extends StatelessWidget {
   final String text;
   final Color color;
+  final Function onPressed;
 
   CustomButton({
     @required this.text,
     @required this.color,
+    @required this.onPressed,
   });
 
   @override
@@ -36,7 +37,7 @@ class CustomButton extends StatelessWidget {
         child: Text(
           text,
         ),
-        onPressed: () {},
+        onPressed: onPressed,
       ),
     );
   }
