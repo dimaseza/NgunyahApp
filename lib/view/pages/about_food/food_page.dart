@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
+import 'package:tubes_apb_nih/data/cubit/cubit.dart';
 import 'package:tubes_apb_nih/data/models/models.dart';
 import 'package:tubes_apb_nih/shared/theme/theme.dart';
 import 'package:tubes_apb_nih/view/components/cards/cards.dart';
@@ -82,12 +84,6 @@ class _FoodPageState extends State<FoodPage> {
               ),
             ],
           ),
-          GestureDetector(
-            onTap: () {
-              Get.to(CartPage());
-            },
-            child: IconBadge(),
-          ),
         ],
       ),
     );
@@ -113,35 +109,47 @@ class _FoodPageState extends State<FoodPage> {
           Container(
             width: double.infinity,
             height: 180,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: [
-                Row(
-                  children: mockFoods
-                      .map(
-                        (food) => Padding(
-                          padding: EdgeInsets.only(
-                            left: (food == mockFoods.first) ? 16 : 0,
-                            right: 16,
-                          ),
-                          child: GestureDetector(
-                            onTap: () {
-                              Get.to(
-                                DetailFoodPage(
-                                  food: food,
-                                  onBackButtonPressed: () {
-                                    Get.back();
-                                  },
+            child: BlocBuilder<FoodCubit, FoodState>(
+              builder: (_, state) => (state is FoodLoaded)
+                  ? ListView(
+                      scrollDirection: Axis.horizontal,
+                      children: [
+                        Row(
+                          children: state.foods
+                              .map(
+                                (food) => Padding(
+                                  padding: EdgeInsets.only(
+                                    left: (food == mockFoods.first) ? 16 : 0,
+                                    right: 16,
+                                  ),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      Get.to(
+                                        DetailFoodPage(
+                                          transaction: Transaction(
+                                            food: food,
+                                            user: (context
+                                                    .read<UserCubit>()
+                                                    .state as UserLoaded)
+                                                .user,
+                                          ),
+                                          onBackButtonPressed: () {
+                                            Get.back();
+                                          },
+                                        ),
+                                      );
+                                    },
+                                    child: FoodCard(food),
+                                  ),
                                 ),
-                              );
-                            },
-                            child: FoodCard(food),
-                          ),
+                              )
+                              .toList(),
                         ),
-                      )
-                      .toList(),
-                ),
-              ],
+                      ],
+                    )
+                  : Center(
+                      child: loadingIndicator,
+                    ),
             ),
           ),
         ],
@@ -168,31 +176,43 @@ class _FoodPageState extends State<FoodPage> {
           SizedBox(
             height: 16,
           ),
-          Builder(
-            builder: (_) {
-              List<Food> foods = (selectedIndex == 0)
-                  ? mockFoods
-                  : (selectedIndex == 1)
-                      ? []
-                      : [];
-
-              return Column(
-                children: foods
-                    .map(
-                      (food) => Padding(
-                        padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
-                        child: GestureDetector(
-                          onTap: () {},
-                          child: FoodCardList(
-                            food: food,
-                            itemWidth:
-                                MediaQuery.of(context).size.width - 2 * 16,
-                          ),
-                        ),
+          BlocBuilder<FoodCubit, FoodState>(
+            builder: (_, state) {
+              if (state is FoodLoaded) {
+                List<Food> foods = state.foods
+                    .where(
+                      (element) => element.types.contains(
+                        (selectedIndex == 0)
+                            ? FoodType.new_food
+                            : (selectedIndex == 1)
+                                ? FoodType.popular
+                                : FoodType.recommended,
                       ),
                     )
-                    .toList(),
-              );
+                    .toList();
+
+                return Column(
+                  children: foods
+                      .map(
+                        (food) => Padding(
+                          padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
+                          child: GestureDetector(
+                            onTap: () {},
+                            child: FoodCardList(
+                              food: food,
+                              itemWidth:
+                                  MediaQuery.of(context).size.width - 2 * 16,
+                            ),
+                          ),
+                        ),
+                      )
+                      .toList(),
+                );
+              } else {
+                return Center(
+                  child: loadingIndicator,
+                );
+              }
             },
           ),
         ],

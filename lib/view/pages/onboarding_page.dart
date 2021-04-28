@@ -90,7 +90,9 @@ class _OnBoardingPageState extends State<OnBoardingPage> {
                       CustomButton(
                         text: "SIGN UP",
                         color: mainColor,
-                        onPressed: () {},
+                        onPressed: () {
+                          Get.to(SignUpPage());
+                        },
                       ),
                       CustomButton(
                         text: "LOGIN",

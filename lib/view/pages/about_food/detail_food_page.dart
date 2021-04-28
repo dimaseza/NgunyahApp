@@ -1,21 +1,22 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:tubes_apb_nih/data/models/models.dart';
-import 'package:tubes_apb_nih/data/providers/cart_provider.dart';
 import 'package:tubes_apb_nih/shared/theme/theme.dart';
 import 'package:tubes_apb_nih/view/components/components.dart';
 import 'package:tubes_apb_nih/view/pages/pages.dart';
 
 class DetailFoodPage extends StatefulWidget {
   final Function onBackButtonPressed;
-  final Food food;
+  final Transaction transaction;
 
   DetailFoodPage({
     this.onBackButtonPressed,
-    this.food,
+    this.transaction,
   });
 
   @override
@@ -23,6 +24,8 @@ class DetailFoodPage extends StatefulWidget {
 }
 
 class _DetailFoodPageState extends State<DetailFoodPage> {
+  int quantity = 1;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,7 +50,7 @@ class _DetailFoodPageState extends State<DetailFoodPage> {
                   ],
                 ),
                 image: DecorationImage(
-                  image: NetworkImage(widget.food.picturePath),
+                  image: NetworkImage(widget.transaction.food.picturePath),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -106,32 +109,6 @@ class _DetailFoodPageState extends State<DetailFoodPage> {
                             ),
                           ),
                         ),
-                        Container(
-                          height: 100,
-                          padding: EdgeInsets.symmetric(horizontal: 16),
-                          child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: GestureDetector(
-                              onTap: () {
-                                Get.to(CartPage());
-                              },
-                              child: Container(
-                                padding: EdgeInsets.all(3),
-                                width: 30,
-                                height: 30,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  color: Colors.black12,
-                                ),
-                                child: Icon(
-                                  Icons.shopping_cart,
-                                  color: whiteColor,
-                                  size: 30,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                     Container(
@@ -159,15 +136,65 @@ class _DetailFoodPageState extends State<DetailFoodPage> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      widget.food.name,
+                                      widget.transaction.food.name,
                                       style: titleStyle,
                                     ),
                                     SizedBox(
                                       height: 6,
                                     ),
-                                    RatingStars(widget.food.rate),
+                                    RatingStars(widget.transaction.food.rate),
                                   ],
                                 ),
+                              ),
+                              Row(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        quantity = max(1, quantity - 1);
+                                      });
+                                    },
+                                    child: Container(
+                                      width: 28,
+                                      height: 28,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(6),
+                                        border: Border.all(width: 2),
+                                      ),
+                                      child: Icon(
+                                        Icons.remove,
+                                        size: 24,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 40,
+                                    child: Text(
+                                      quantity.toString(),
+                                      textAlign: TextAlign.center,
+                                      style: titleStyle,
+                                    ),
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        quantity = min(999, quantity + 1);
+                                      });
+                                    },
+                                    child: Container(
+                                      width: 28,
+                                      height: 28,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(6),
+                                        border: Border.all(width: 2),
+                                      ),
+                                      child: Icon(
+                                        Icons.add,
+                                        size: 24,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
@@ -181,7 +208,7 @@ class _DetailFoodPageState extends State<DetailFoodPage> {
                           Container(
                             margin: EdgeInsets.fromLTRB(16, 0, 16, 16),
                             child: Text(
-                              widget.food.description,
+                              widget.transaction.food.description,
                               style: bodyRegularStyle,
                             ),
                           ),
@@ -195,7 +222,7 @@ class _DetailFoodPageState extends State<DetailFoodPage> {
                           Container(
                             margin: EdgeInsets.fromLTRB(16, 0, 16, 0),
                             child: Text(
-                              widget.food.ingredients,
+                              widget.transaction.food.ingredients,
                               style: bodyRegularStyle,
                             ),
                           ),
@@ -220,7 +247,8 @@ class _DetailFoodPageState extends State<DetailFoodPage> {
                                               locale: 'id-ID',
                                               symbol: 'IDR ',
                                               decimalDigits: 0)
-                                          .format(widget.food.price),
+                                          .format(
+                                              widget.transaction.food.price),
                                       style: titleStyle,
                                     )
                                   ],
@@ -245,21 +273,18 @@ class _DetailFoodPageState extends State<DetailFoodPage> {
                                       ),
                                     ),
                                     child: Text(
-                                      "ADD TO CART",
+                                      "ORDER NOW",
                                     ),
                                     onPressed: () {
-                                      Provider.of<CartProvider>(
-                                        context,
-                                        listen: false,
-                                      ).addToCart(
-                                        widget.food.id,
-                                        widget.food.picturePath,
-                                        widget.food.name,
-                                        widget.food.description,
-                                        widget.food.ingredients,
-                                        widget.food.price,
-                                        widget.food.rate,
-                                        1,
+                                      Get.to(
+                                        PaymentPage(
+                                          transaction:
+                                              widget.transaction.copyWith(
+                                            quantity: quantity,
+                                            total: quantity *
+                                                widget.transaction.food.price,
+                                          ),
+                                        ),
                                       );
                                     },
                                   ),
