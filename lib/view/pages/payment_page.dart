@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:tubes_apb_nih/data/models/models.dart';
 import 'package:tubes_apb_nih/shared/theme/theme.dart';
+import 'package:tubes_apb_nih/view/pages/map_page.dart';
 
 class PaymentPage extends StatefulWidget {
   final Transaction transaction;
@@ -520,7 +521,9 @@ class _PaymentPageState extends State<PaymentPage> {
             color: whiteColor,
           ),
           child: GestureDetector(
-            onTap: () {},
+            onTap: () {
+              Get.to(MapPage());
+            },
             child: Container(
               height: 56,
               width: double.infinity,

@@ -45,9 +45,7 @@ class _MainPageState extends State<MainPage> {
           children: [
             FoodPage(),
             SearchFoodPage(),
-            Center(
-              child: Text("History Page"),
-            ),
+            HistoryFoodPage(),
             Center(
               child: Text("Profile Page"),
             ),
