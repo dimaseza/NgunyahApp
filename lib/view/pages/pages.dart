@@ -3,3 +3,4 @@ export 'main_page.dart';
 export 'payment_page.dart';
 export 'map_page.dart';
 export 'success_page.dart';
+export 'payment_method_page.dart';

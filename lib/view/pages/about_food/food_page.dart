@@ -64,7 +64,10 @@ class _FoodPageState extends State<FoodPage> {
                   shape: BoxShape.circle,
                   image: DecorationImage(
                     image: NetworkImage(
-                        "https://thumbs.dreamstime.com/b/handsome-man-hair-style-beard-beauty-face-portrait-fashion-male-model-black-hair-high-resolution-handsome-man-125031765.jpg"),
+                      (context.read<UserCubit>().state as UserLoaded)
+                          .user
+                          .picturePath,
+                    ),
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -119,7 +122,7 @@ class _FoodPageState extends State<FoodPage> {
                               .map(
                                 (food) => Padding(
                                   padding: EdgeInsets.only(
-                                    left: (food == mockFoods.first) ? 16 : 0,
+                                    left: (food == state.foods.first) ? 16 : 0,
                                     right: 16,
                                   ),
                                   child: GestureDetector(

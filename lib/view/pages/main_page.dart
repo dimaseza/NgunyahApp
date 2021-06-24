@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tubes_apb_nih/shared/theme/theme.dart';
 import 'package:tubes_apb_nih/view/pages/about_food/about_food.dart';
+import 'package:tubes_apb_nih/view/pages/auth/auth.dart';
 
 class MainPage extends StatefulWidget {
   final int bottomNavBarIndex;
@@ -15,11 +17,22 @@ class _MainPageState extends State<MainPage> {
   int bottomNavBarIndex;
   PageController pageController;
 
+  SharedPreferences loginData;
+  String email;
+
   @override
   void initState() {
     super.initState();
+    initial();
     bottomNavBarIndex = widget.bottomNavBarIndex;
     pageController = PageController(initialPage: bottomNavBarIndex);
+  }
+
+  void initial() async {
+    loginData = await SharedPreferences.getInstance();
+    setState(() {
+      email = loginData.getString('email');
+    });
   }
 
   @override
@@ -46,9 +59,7 @@ class _MainPageState extends State<MainPage> {
             FoodPage(),
             SearchFoodPage(),
             HistoryFoodPage(),
-            Center(
-              child: Text("Profile Page"),
-            ),
+            ProfilePage(),
           ],
         ),
         createCustomBottomNavBar(),

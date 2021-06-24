@@ -1,10 +1,23 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:tubes_apb_nih/data/cubit/cubit.dart';
+import 'package:tubes_apb_nih/data/models/models.dart';
 import 'package:tubes_apb_nih/shared/theme/theme.dart';
 import 'package:tubes_apb_nih/view/components/components.dart';
 import 'package:tubes_apb_nih/view/pages/main_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AddressPage extends StatefulWidget {
+  final User user;
+  final String password;
+  final File pictureFile;
+
+  AddressPage(this.user, this.password, this.pictureFile);
+
   @override
   _AddressPageState createState() => _AddressPageState();
 }
@@ -14,6 +27,8 @@ class _AddressPageState extends State<AddressPage> {
   TextEditingController addressController = TextEditingController();
   TextEditingController houseNumController = TextEditingController();
   TextEditingController cityController = TextEditingController();
+
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -115,7 +130,6 @@ class _AddressPageState extends State<AddressPage> {
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: TextField(
                         controller: addressController,
-                        obscureText: true,
                         decoration: InputDecoration(
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
@@ -137,7 +151,6 @@ class _AddressPageState extends State<AddressPage> {
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: TextField(
                         controller: cityController,
-                        obscureText: true,
                         decoration: InputDecoration(
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
@@ -155,17 +168,77 @@ class _AddressPageState extends State<AddressPage> {
                     SizedBox(
                       height: 26,
                     ),
-                    CustomButton(
-                      text: "Sign Up",
-                      color: mainColor,
-                      onPressed: () {
-                        Get.offAll(
-                          MainPage(
-                            bottomNavBarIndex: 0,
+                    isLoading == true
+                        ? Container(
+                            width: double.infinity,
+                            margin: EdgeInsets.only(top: 24),
+                            height: 45,
+                            child: Center(
+                              child: loadingIndicator,
+                            ),
+                          )
+                        : CustomButton(
+                            text: "Sign Up",
+                            color: mainColor,
+                            onPressed: () async {
+                              User user = widget.user.copyWith(
+                                phoneNumber: phoneController.text,
+                                address: addressController.text,
+                                houseNumber: houseNumController.text,
+                                city: cityController.text,
+                              );
+
+                              setState(() {
+                                isLoading = true;
+                              });
+
+                              await context.read<UserCubit>().signUp(
+                                    user,
+                                    widget.password,
+                                    pictureFile: widget.pictureFile,
+                                  );
+
+                              UserState state = context.read<UserCubit>().state;
+
+                              if (state is UserLoaded) {
+                                context.read<FoodCubit>().getFoods();
+                                context
+                                    .read<TransactionCubit>()
+                                    .getTransactions();
+                                Get.offAll(
+                                  MainPage(
+                                    bottomNavBarIndex: 0,
+                                  ),
+                                );
+                              } else {
+                                Get.snackbar(
+                                  "",
+                                  "",
+                                  backgroundColor: redColor,
+                                  icon: Icon(
+                                    MdiIcons.closeCircleOutline,
+                                    color: whiteColor,
+                                  ),
+                                  titleText: Text(
+                                    "Sign Up Failed",
+                                    style: GoogleFonts.poppins(
+                                      color: whiteColor,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  messageText: Text(
+                                    (state as UserLoadingFailed).message,
+                                    style: GoogleFonts.poppins(
+                                      color: whiteColor,
+                                    ),
+                                  ),
+                                );
+                              }
+                              setState(() {
+                                isLoading = false;
+                              });
+                            },
                           ),
-                        );
-                      },
-                    ),
                   ],
                 ),
               ),

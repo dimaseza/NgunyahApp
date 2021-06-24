@@ -1,8 +1,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.tubes_apb_nih">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
    <application
+        android:usesCleartextTraffic="true"
         android:label="tubes_apb_nih"
         android:icon="@mipmap/ic_launcher">
+
+        <meta-data android:name="com.google.android.geo.API_KEY" android:value="YOUR_API_KEY" />
+
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

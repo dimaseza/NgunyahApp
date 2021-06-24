@@ -111,6 +111,9 @@ class _HistoryFoodPageState extends State<HistoryFoodPage> {
                         ],
                       ),
                     ),
+                    Container(
+                      height: 80,
+                    ),
                   ],
                 ),
               ],

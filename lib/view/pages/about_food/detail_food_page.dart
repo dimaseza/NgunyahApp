@@ -93,7 +93,6 @@ class _DetailFoodPageState extends State<DetailFoodPage> {
                                 }
                               },
                               child: Container(
-                                padding: EdgeInsets.all(3),
                                 width: 30,
                                 height: 30,
                                 decoration: BoxDecoration(

@@ -8,6 +8,7 @@ class SuccessPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: whiteColor,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

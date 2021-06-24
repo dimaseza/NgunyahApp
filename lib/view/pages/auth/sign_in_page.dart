@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tubes_apb_nih/data/cubit/cubit.dart';
 import 'package:tubes_apb_nih/shared/theme/theme.dart';
 import 'package:tubes_apb_nih/view/components/components.dart';
@@ -17,6 +18,33 @@ class _SignInPageState extends State<SignInPage> {
   TextEditingController passwordController = TextEditingController();
 
   bool isLoading = false;
+
+  SharedPreferences loginData;
+  bool newLogin;
+
+  @override
+  void initState() {
+    super.initState();
+    isLogin();
+  }
+
+  isLogin() async {
+    loginData = await SharedPreferences.getInstance();
+    newLogin = (loginData.getBool('account') ?? true);
+
+    UserState state = context.read<UserCubit>().state;
+
+    if (state is UserLoaded) {
+      context.read<FoodCubit>().getFoods();
+      context.read<TransactionCubit>().getTransactions();
+
+      Get.offAll(
+        MainPage(
+          bottomNavBarIndex: 0,
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -140,6 +168,11 @@ class _SignInPageState extends State<SignInPage> {
                                 context
                                     .read<TransactionCubit>()
                                     .getTransactions();
+
+                                loginData.setBool("account", false);
+
+                                loginData.setString(
+                                    "email", emailController.text);
 
                                 Get.offAll(
                                   MainPage(

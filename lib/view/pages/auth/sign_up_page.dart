@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:tubes_apb_nih/data/models/models.dart';
 import 'package:tubes_apb_nih/shared/theme/theme.dart';
 import 'package:tubes_apb_nih/view/components/components.dart';
 import 'package:tubes_apb_nih/view/pages/auth/auth.dart';
+import 'package:image_picker/image_picker.dart';
 
 class SignUpPage extends StatefulWidget {
   @override
@@ -11,6 +15,9 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
+  User user;
+  File pictureFile;
+
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController nameController = TextEditingController();
@@ -69,6 +76,47 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
                 child: Column(
                   children: [
+                    GestureDetector(
+                      onTap: () async {
+                        PickedFile pickedFile = await ImagePicker()
+                            .getImage(source: ImageSource.gallery);
+                        if (pickedFile != null) {
+                          pictureFile = File(pickedFile.path);
+                          setState(() {});
+                        }
+                      },
+                      child: Container(
+                        width: 110,
+                        height: 110,
+                        margin: EdgeInsets.only(bottom: 20),
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: AssetImage('assets/images/photo_border.png'),
+                          ),
+                        ),
+                        child: (pictureFile != null)
+                            ? Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  image: DecorationImage(
+                                    image: FileImage(pictureFile),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              )
+                            : Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  image: DecorationImage(
+                                    image:
+                                        AssetImage('assets/images/photo.png'),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                      ),
+                    ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: TextField(
@@ -138,7 +186,16 @@ class _SignUpPageState extends State<SignUpPage> {
                       text: "Continue",
                       color: mainColor,
                       onPressed: () {
-                        Get.to(AddressPage());
+                        Get.to(
+                          AddressPage(
+                            User(
+                              name: nameController.text,
+                              email: emailController.text,
+                            ),
+                            passwordController.text,
+                            pictureFile,
+                          ),
+                        );
                       },
                     ),
                   ],

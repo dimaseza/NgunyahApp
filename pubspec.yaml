@@ -18,7 +18,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=2.7.0 <3.0.0'
+  sdk: '>=2.10.0 <3.0.0'
 
 dependencies:
   flutter:
@@ -29,10 +29,19 @@ dependencies:
   flutter_spinkit: ^5.0.0
   get: ^3.26.0
   google_fonts: ^2.0.0
+  image_picker: ^0.7.5+3
   intl: ^0.17.0
   material_design_icons_flutter: ^4.0.5955
   provider: ^5.0.0
   sqflite: ^2.0.0+3
+  url_launcher: ^6.0.4
+  ffi: ^1.0.0
+  google_maps_flutter: ^2.0.0
+  flutter_polyline_points: ^1.0.0
+  shared_preferences: ^2.0.0
+
+  # here_sdk:
+  #   path: plugins/here_sdk
 
 dev_dependencies:
   flutter_test:

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:tubes_apb_nih/data/cubit/cubit.dart';
 import 'package:tubes_apb_nih/data/models/models.dart';
 import 'package:tubes_apb_nih/shared/theme/theme.dart';
 import 'package:tubes_apb_nih/view/pages/map_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class PaymentPage extends StatefulWidget {
   final Transaction transaction;
@@ -521,8 +524,42 @@ class _PaymentPageState extends State<PaymentPage> {
             color: whiteColor,
           ),
           child: GestureDetector(
-            onTap: () {
-              Get.to(MapPage());
+            onTap: () async {
+              setState(() {
+                isLoading = true;
+              });
+
+              String paymentUrl = await context
+                  .read<TransactionCubit>()
+                  .submitTransaction(
+                    widget.transaction.copyWith(
+                      dateTime: DateTime.now(),
+                      total: (widget.transaction.total * 1.1).toInt() + 50000,
+                    ),
+                  );
+
+              if (paymentUrl != null) {
+                Get.to(MapPage(paymentUrl));
+              } else {
+                setState(() {
+                  isLoading = false;
+                });
+                Get.snackbar(
+                  "",
+                  "",
+                  backgroundColor: redColor,
+                  icon: Icon(MdiIcons.closeCircleOutline, color: Colors.white),
+                  titleText: Text(
+                    'Transaction Failed',
+                    style: GoogleFonts.poppins(
+                        color: Colors.white, fontWeight: FontWeight.w600),
+                  ),
+                  messageText: Text(
+                    'Please try again later.',
+                    style: GoogleFonts.poppins(color: Colors.white),
+                  ),
+                );
+              }
             },
             child: Container(
               height: 56,
